@@ -21,6 +21,7 @@ class IndeedSpider(scrapy.Spider):
         for row in rows:
             item = LearnscrapyItem()
             item['jobTitle'] = row.xpath('h2[@class="jobtitle"]/a/@title').extract()
+            item['company'] = row.xpath('span/span[@itemprop="name"]').extract()
             items.append(item)
 
         return items
