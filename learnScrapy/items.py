@@ -14,7 +14,6 @@ class LearnscrapyItem(Item):
     # name = scrapy.Field()
     jobTitle = Field()
     company = Field()
-    company2 = Field()
     # linkURL = Field()
     # location = Field()
 
