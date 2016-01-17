@@ -28,6 +28,7 @@ class IndeedSpider(scrapy.Spider):
                 item['jobTitle'] = sub.xpath('a/@title').extract()[0]
                 item['company'] = sub.xpath('div/span[@class="company"]/text()')\
                     .extract()[0].strip('\n\t ')  # seems [0] is necessary. ?
+               # item['location'] = sub.xpath('div/span[@class="location"]/text()').extract()[0]
                 items.append(item)
 
         """ Gather normal job listings, minus the last 'special' one """

@@ -15,7 +15,7 @@ class LearnscrapyItem(Item):
     jobTitle = Field()
     company = Field()
     # linkURL = Field()
-    # location = Field()
+    location = Field()
 
     # summary = Field()
     # print jobTitle
