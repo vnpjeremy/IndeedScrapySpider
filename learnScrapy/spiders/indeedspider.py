@@ -36,12 +36,17 @@ class IndeedSpider(scrapy.Spider):
             item['jobTitle'] = row.xpath('h2/a/@title').extract()[0]
             item['company'] = row.xpath('span/span[@itemprop="name"]/text()') \
                 .extract()[0].strip('\n\t ')
+            item['location'] = row.xpath('span/span/span[@itemprop="addressLocality"]/text()') \
+                .extract()[0].strip('\n\t ')
             items.append(item)
 
         """ Get the last normal job listing """
         item = LearnscrapyItem()
         item['jobTitle'] = lastRow.xpath('h2/a/@title').extract()[0]
-        item['company'] = lastRow.xpath('span/span[@itemprop="name"]/text()').extract()[0].strip('\n\t').lstrip()
+        item['company'] = lastRow.xpath('span/span[@itemprop="name"]/text()') \
+            .extract()[0].strip('\n\t').lstrip()
+        item['location'] = lastRow.xpath('span/span/span[@itemprop="addressLocality"]/text()') \
+            .extract()[0].strip('\n\t ')
         items.append(item)
 
         return items
