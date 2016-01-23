@@ -10,9 +10,10 @@ from scrapy.item import Item, Field
 
 
 class LearnscrapyItem(Item):
-    jobTitle = Field()
+    jobtitle = Field()
     company = Field()
     # linkURL = Field()
     location = Field()
+    date = Field()
     # summary = Field()
     # print jobTitle
