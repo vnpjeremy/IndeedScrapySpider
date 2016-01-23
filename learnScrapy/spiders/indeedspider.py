@@ -14,7 +14,7 @@ class IndeedSpider(scrapy.Spider):
 
     def parse(self, response):
         sel = Selector(response)
-        rows = sel.xpath('//div[@class="  row  result"]')  # can also apparently do response.xpath() directly
+        rows = sel.xpath('//div[@class="  row  result"]')
         sponsored = sel.xpath('//div[@data-tn-section="sponsoredJobs"]')
         lastRow = sel.xpath('//div[@class="lastRow  row  result"]')
 
@@ -25,8 +25,8 @@ class IndeedSpider(scrapy.Spider):
             for sub in subRows:
                 item = LearnscrapyItem()
                 item['jobTitle'] = sub.xpath('a/@title').extract()[0]
-                item['company'] = sub.xpath('div/span[@class="company"]/text()')\
-                    .extract()[0].strip('\n\t ')  # seems [0] is necessary. ?
+                item['company'] = sub.xpath('div/span[@class="company"]'
+                                            '/text()').extract()[0].strip('\n\t ')
                 item['location'] = sub.xpath('div/span[@class="location"]/text()').extract()[0]
                 items.append(item)
 
@@ -34,19 +34,19 @@ class IndeedSpider(scrapy.Spider):
         for row in rows:
             item = LearnscrapyItem()
             item['jobTitle'] = row.xpath('h2/a/@title').extract()[0]
-            item['company'] = row.xpath('span/span[@itemprop="name"]/text()') \
-                .extract()[0].strip('\n\t ')
-            item['location'] = row.xpath('span/span/span[@itemprop="addressLocality"]/text()') \
-                .extract()[0].strip('\n\t ')
+            item['company'] = row.xpath('span/span[@itemprop="name"]'
+                                        '/text()').extract()[0].strip('\n\t ')
+            item['location'] = row.xpath('span/span/span[@itemprop="addressLocality"]'
+                                         '/text()').extract()[0].strip('\n\t ')
             items.append(item)
 
         """ Get the last normal job listing """
         item = LearnscrapyItem()
         item['jobTitle'] = lastRow.xpath('h2/a/@title').extract()[0]
-        item['company'] = lastRow.xpath('span/span[@itemprop="name"]/text()') \
-            .extract()[0].strip('\n\t').lstrip()
-        item['location'] = lastRow.xpath('span/span/span[@itemprop="addressLocality"]/text()') \
-            .extract()[0].strip('\n\t ')
+        item['company'] = lastRow.xpath('span/span[@itemprop="name"]'
+                                        '/text()').extract()[0].strip('\n\t ')
+        item['location'] = lastRow.xpath('span/span/span[@itemprop="addressLocality"]'
+                                         '/text()').extract()[0].strip('\n\t ')
         items.append(item)
 
         return items
