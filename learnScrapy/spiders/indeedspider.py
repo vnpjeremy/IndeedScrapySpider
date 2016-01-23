@@ -27,7 +27,10 @@ class IndeedSpider(scrapy.Spider):
                 item['jobtitle'] = sub.xpath('a/@title').extract()[0]
                 item['company'] = sub.xpath('div/span[@class="company"]'
                                             '/text()').extract()[0].strip('\n\t ')
-                item['location'] = sub.xpath('div/span[@class="location"]/text()').extract()[0]
+                item['location'] = sub.xpath('div/span[@class="location"]'
+                                             '/text()').extract()[0]
+                item['date'] = sub.xpath('div/div/span[@class="date"]'
+                                         '/text()').extract()[0]
                 items.append(item)
 
         """ Gather normal job listings, minus the last 'special' one """
@@ -38,6 +41,8 @@ class IndeedSpider(scrapy.Spider):
                                         '/text()').extract()[0].strip('\n\t ')
             item['location'] = row.xpath('span/span/span[@itemprop="addressLocality"]'
                                          '/text()').extract()[0].strip('\n\t ')
+            item['date'] = row.xpath('table/tr/td/div/div/span[@class="date"]'
+                                     '/text()').extract()[0]
             items.append(item)
 
         """ Get the last normal job listing """
@@ -47,6 +52,8 @@ class IndeedSpider(scrapy.Spider):
                                         '/text()').extract()[0].strip('\n\t ')
         item['location'] = lastrow.xpath('span/span/span[@itemprop="addressLocality"]'
                                          '/text()').extract()[0].strip('\n\t ')
+        item['date'] = lastrow.xpath('table/tr/td/div/div/span[@class="date"]'
+                                     '/text()').extract()[0]
         items.append(item)
 
         return items
