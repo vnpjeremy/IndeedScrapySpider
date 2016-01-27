@@ -1,18 +1,26 @@
 # -*- coding: utf-8 -*-
 import scrapy
 
+from scrapy.linkextractors import LinkExtractor
+from scrapy.spiders import CrawlSpider, Rule
 from scrapy.selector import Selector
 from learnScrapy.items import LearnscrapyItem
 
 
-class IndeedSpider(scrapy.Spider):
+class IndeedSpider(CrawlSpider):
     name = "indeedspider"
-    allowed_domains = ["www.indeed.com"]
+    allowed_domains = ['indeed.com']
     start_urls = [
         'http://www.indeed.com/jobs?q=mechanical+engineer&l=united+states&sort=date',
     ]
 
-    def parse(self, response):
+    rules = (
+        Rule(LinkExtractor(allow=('/jobs?q=mechanical+engineer&l=united+states&sort=date$,'
+                                  '/jobs?q=mechanical+engineer&l=united+states&sort=date&start=[0-9]+$',),),
+             callback='parse_item', follow=True),
+            )
+
+    def parse_item(self, response):
         sel = Selector(response)
         rows = sel.xpath('//div[@class="  row  result"]')
         sponsored = sel.xpath('//div[@data-tn-section="sponsoredJobs"]')
@@ -57,3 +65,6 @@ class IndeedSpider(scrapy.Spider):
         items.append(item)
 
         return items
+
+
+SPIDER = IndeedSpider()
