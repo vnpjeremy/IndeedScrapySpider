@@ -5,7 +5,7 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 from scrapy.utils.markup import remove_tags
-
+from scrapy.exceptions import DropItem
 
 class LearnScrapyPipeline(object):
     def process_item(self, item, spider):
@@ -16,5 +16,8 @@ class LearnScrapyPipeline(object):
         item['job_title'] = item['job_title'][0]
         item['location'] = item['location'][0]
         item['date'] = item['date'][0]
+
+        if '30+' in item['date']:
+            raise DropItem("Too old %s" % item)
 
         return item
