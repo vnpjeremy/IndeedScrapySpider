@@ -2,7 +2,7 @@ from scrapy import cmdline
 import os
 
 file = "newOutput1.json"
-cmd = "scrapy crawl indeedspider -o "
+cmd = "scrapy crawl indeed_spider -o "
 both = cmd + file
 if os.path.isfile(file):
     os.remove(file)
