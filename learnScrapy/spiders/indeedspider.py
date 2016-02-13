@@ -22,6 +22,7 @@ class IndeedSpider(scrapy.Spider):
         sponsored = sel.xpath('//div[@data-tn-section="sponsoredJobs"]')
 
         items = []
+        """ Sponsored job listings have a different footprint """
         for ii in sponsored:
             sub_rows = ii.xpath('div')
             for jj in sub_rows:
@@ -32,13 +33,14 @@ class IndeedSpider(scrapy.Spider):
                 item['date'] = jj.xpath('div/div/span[@class="date"]/text()').extract()
                 items.append(item)
 
-        """ Gather normal job listings, minus the last 'special' one """
-        for row in rows:
+        """ Gather normal job listings """
+        for ii in rows:
             item = LearnScrapyItem()
-            item['job_title'] = row.xpath('h2/a/@title').extract()
-            item['company'] = row.xpath('span/span[@itemprop="name"]/text()').extract()
-            item['location'] = row.xpath('span/span/span[@itemprop="addressLocality"]/text()').extract()
-            item['date'] = row.xpath('table/tr/td/div/div/span[@class="date"]/text()').extract()
+            item['job_title'] = ii.xpath('h2/a/@title').extract()
+            item['company'] = ii.xpath('span/span[@itemprop="name"]/text()').extract()
+            # item['company'] = remove_tags(item['company'])
+            item['location'] = ii.xpath('span/span/span[@itemprop="addressLocality"]/text()').extract()
+            item['date'] = ii.xpath('table/tr/td/div/div/span[@class="date"]/text()').extract()
             items.append(item)
 
         return items
