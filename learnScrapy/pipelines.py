@@ -30,6 +30,25 @@ class LearnScrapyPipeline(object):
         if 'manufacturing' in item['job_title']:
             raise DropItem("Title fail" % item)
 
+        if not ('CA' in item['location'] or
+                        'WA' in item['location'] or
+                        'CO' in item['location'] or
+                        'TX' in item['location'] or
+                        'MN' in item['location'] or
+                        'FL' in item['location'] or
+                        'GA' in item['location'] or
+                        'MA' in item['location'] or
+                        'CT' in item['location'] or
+                        'NY' in item['location'] or
+                        'WI' in item['location'] or
+                        'MD' in item['location'] or
+                        'DE' in item['location'] or
+                        'VA' in item['location'] or
+                        'NJ' in item['location'] or
+                        'IL' in item['location']
+                ):
+            raise DropItem("Location fail" % item)
+
         return item
 
         # def job_title_exclusion(self, item):
