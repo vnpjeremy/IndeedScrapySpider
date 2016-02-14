@@ -4,8 +4,6 @@
 #
 # See documentation in:
 # http://doc.scrapy.org/en/latest/topics/items.html
-
-#import scrapy
 from scrapy.item import Item, Field
 
 
@@ -15,5 +13,6 @@ class LearnScrapyItem(Item):
     # linkURL = Field()
     location = Field()
     date = Field()
+    link_url = Field()
     # summary = Field()
     # print jobTitle

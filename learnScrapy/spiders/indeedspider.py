@@ -9,12 +9,12 @@ class IndeedSpider(scrapy.Spider):
     name = "indeed_spider"
     allowed_domains = ["www.indeed.com"]
     start_urls = [
-        'http://www.indeed.com/jobs?q=mechanical+engineer&l=wilmington+de&radius=0',
+        'http://www.indeed.com/jobs?q=mechanical+engineer&l=',
     ]
-    base_url = "http://www.indeed.com/jobs?q=mechanical+engineer&l=wilmington+de&radius=0&start="
+    base_url = "http://www.indeed.com/jobs?q=mechanical+engineer&start="
 
-    # for i in range(10, 50, 10):
-    #     start_urls.append(base_url + str(i))
+    for i in range(10, 30, 10):
+        start_urls.append(base_url + str(i))
 
     def parse(self, response):
         sel = Selector(response)
@@ -31,6 +31,7 @@ class IndeedSpider(scrapy.Spider):
                 item['company'] = jj.xpath('div/span[@class="company"]/text()').extract()
                 item['location'] = jj.xpath('div/span[@class="location"]/text()').extract()
                 item['date'] = jj.xpath('div/div/span[@class="date"]/text()').extract()
+                item['link_url'] = jj.xpath('a/@href').extract()
                 items.append(item)
 
         """ Gather normal job listings """
@@ -38,9 +39,9 @@ class IndeedSpider(scrapy.Spider):
             item = LearnScrapyItem()
             item['job_title'] = ii.xpath('h2/a/@title').extract()
             item['company'] = ii.xpath('span/span[@itemprop="name"]/text()').extract()
-            # item['company'] = remove_tags(item['company'])
             item['location'] = ii.xpath('span/span/span[@itemprop="addressLocality"]/text()').extract()
             item['date'] = ii.xpath('table/tr/td/div/div/span[@class="date"]/text()').extract()
+            item['link_url'] = ii.xpath('h2/a/@href').extract()
             items.append(item)
 
         return items
