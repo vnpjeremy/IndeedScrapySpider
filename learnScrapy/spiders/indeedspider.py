@@ -9,11 +9,11 @@ class IndeedSpider(scrapy.Spider):
     name = "indeed_spider"
     allowed_domains = ["www.indeed.com"]
     start_urls = [
-        'http://www.indeed.com/jobs?q=mechanical+engineer&l=',
+        'http://www.indeed.com/jobs?q=mechanical+title%3Aengineer&sort=date&sr=directhire',
     ]
-    base_url = "http://www.indeed.com/jobs?q=mechanical+engineer&start="
+    base_url = "http://www.indeed.com/jobs?q=mechanical+title%3Aengineer&sort=date&sr=directhire&start="
 
-    for i in range(10, 30, 10):
+    for i in range(10, 100, 10):
         start_urls.append(base_url + str(i))
 
     def parse(self, response):
