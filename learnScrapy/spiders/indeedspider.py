@@ -10,9 +10,9 @@ class IndeedSpider(scrapy.Spider):
     name = "indeed_spider"
     allowed_domains = ["www.indeed.com"]
     start_urls = [
-        'http://www.indeed.com/jobs?q=mechanical+title%3Aengineer&sort=date&sr=directhire',
+        'http://www.indeed.com/jobs?q=mechanical+title%3Aengineer&sr=directhire',
     ]
-    base_url = "http://www.indeed.com/jobs?q=mechanical+title%3Aengineer&sort=date&sr=directhire&start="
+    base_url = "http://www.indeed.com/jobs?q=mechanical+title%3Aengineer&sr=directhire&start="
 
     for i in range(10, 10, 10):
         start_urls.append(base_url + str(i))
@@ -45,11 +45,13 @@ class IndeedSpider(scrapy.Spider):
             item['link_url'] = ii.xpath('h2/a/@href').extract()
 
             url = url_prefix + item['link_url'][0]
+            item = format_item(self, item)
 
-            request = Request(url, callback=self.parse_job_link)
-            request.meta['item'] = item
-            yield request
-            items.append(item)
+            if not location_exclusion(self, item):
+                request = Request(url, callback=self.parse_job_link)
+                request.meta['item'] = item
+                yield request
+                items.append(item)
 
         return
 
@@ -58,3 +60,35 @@ class IndeedSpider(scrapy.Spider):
         item = response.request.meta['item']
 
         return item
+
+
+def format_item(self, item):
+    item['location'] = item['location'][0]
+    return item
+
+
+def date_exclusion(self, item):
+    if '30+' in item['date']:
+        return True
+    return False
+
+
+def location_exclusion(self, item):
+    if ('CA' in item['location'] or
+                'WA' in item['location'] or
+                'CO' in item['location'] or
+                'TX' in item['location'] or
+                'MN' in item['location'] or
+                'FL' in item['location'] or
+                'GA' in item['location'] or
+                'MA' in item['location'] or
+                'CT' in item['location'] or
+                'NY' in item['location'] or
+                'WI' in item['location'] or
+                'MD' in item['location'] or
+                'DE' in item['location'] or
+                'VA' in item['location'] or
+                'NJ' in item['location'] or
+                'IL' in item['location']):
+        return False
+    return True
