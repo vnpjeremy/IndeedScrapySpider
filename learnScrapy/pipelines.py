@@ -4,34 +4,52 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
-from scrapy.utils.markup import remove_tags
 from scrapy.exceptions import DropItem
+from scrapy.selector import Selector
+from scrapy.utils.markup import remove_tags
+import lxml.html
+import lxml.etree
+import html2text
+import BeautifulSoup
+
+54
 
 
 class LearnScrapyPipeline(object):
     def process_item(self, item, spider):
-        item['company'] = item['company'][0]
-        item['company'] = remove_tags(item['company'])
-        item['company'] = item['company'].lstrip('\n ')
-
-        item['job_title'] = item['job_title'][0]
-        item['job_title'] = item['job_title'].lower()
-        item['location'] = item['location'][0]
-        item['date'] = item['date'][0]
-
-        item['link_url'] = item['link_url'][0]
-        item['link_url'] = 'www.indeed.com' + item['link_url']
-
         if date_exclusion(self, item):
             raise DropItem("Too old %s" % item)
 
         if location_exclusion(self, item):
-            raise DropItem("Location fail" % item)
+            raise DropItem("Location fail %s" % item)
 
         if job_title_exclusion(self, item):
-            raise DropItem("Job title fail" % item)
+            raise DropItem("Job title fail %s" % item)
+
+        if text_exclusion(self, item):
+            raise DropItem("Prohibited text %s" % item)
 
         return item
+
+
+def text_exclusion(self, item):
+    link_response = item['link_response'].body
+    link_response = remove_javascript(link_response)
+    link_response = remove_tags(link_response)
+    link_response = link_response.lower()
+
+    if ("master's" in link_response or
+                "master" in link_response):
+        return True
+    return False
+
+
+def remove_javascript(link_response):
+    soup = BeautifulSoup.BeautifulSoup(link_response)
+    to_extract = soup.findAll('script')
+    for ii in to_extract:
+        ii.extract()
+    return soup.prettify()
 
 
 def job_title_exclusion(self, item):
