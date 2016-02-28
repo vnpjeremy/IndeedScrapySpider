@@ -3,6 +3,7 @@ import scrapy
 from scrapy.selector import Selector
 from learnScrapy.items import LearnScrapyItem
 from scrapy.http import Request
+import re
 
 
 class IndeedSpider(scrapy.Spider):
@@ -14,7 +15,7 @@ class IndeedSpider(scrapy.Spider):
     base_url = "http://www.indeed.com/jobs?q=%28mechanical+or+aerospace%29+title%3Aengineer&l=" \
                "united+states&sr=directhire&start="
 
-    for i in range(10, 30, 10):
+    for i in range(10, 400, 10):
         start_urls.append(base_url + str(i))
     pages = len(start_urls)
 
@@ -44,7 +45,7 @@ class IndeedSpider(scrapy.Spider):
                     request = Request(item['link_url'], callback=self.parse_job_link)
                     request.meta['item'] = item
                     yield request
-                    items.append(item)
+                    # items.append(item)
 
         """ Gather normal job listings """
         for ii in rows:
@@ -63,7 +64,7 @@ class IndeedSpider(scrapy.Spider):
                 request = Request(item['link_url'], callback=self.parse_job_link)
                 request.meta['item'] = item
                 yield request
-                items.append(item)
+                # items.append(item)
 
         return
 
@@ -109,44 +110,50 @@ def location_exclusion(self, item):
 
 
 def location_inclusion(self, item):
-    if ('ca' in item['location'] or
-                'wa' in item['location'] or
-                'co' in item['location'] or
-                'tx' in item['location'] or
-        #        'mn' in item['location'] or
-        # 'FL' in item['location'] or
-                'ga' in item['location'] or
-                'ma' in item['location'] or
-                'ct' in item['location'] or
-                'ny' in item['location'] or
-        # 'WI' in item['location'] or
-                'md' in item['location'] or
-                'va' in item['location'] or
-                'nj' in item['location'] or
-                'dc' in item['location'] or
-                'il' in item['location']):
-        return True
+    locations = []
+    locations.append(r"ca")
+    locations.append(r"wa")
+    locations.append(r"co")
+    locations.append(r"tx")
+    locations.append(r"mn")
+    locations.append(r"fl")
+    locations.append(r"ga")
+    locations.append(r"ct")
+    locations.append(r"ny")
+    locations.append(r"wi")
+    locations.append(r"md")
+    locations.append(r"dc")
+    locations.append(r"va")
+    locations.append(r"nj")
+    locations.append(r"il")
+
+    for ii in locations:
+        if re.search(r"\b" + ii + r"\b", item['location']):
+            return True
     return False
 
 
 def job_title_exclusion(self, item):
-    if ('manufacturing' in item['job_title'] or
-                'hvac' in item['job_title'] or
-                'facility' in item['job_title'] or
-                'facilities' in item['job_title'] or
-                'hvac' in item['job_title'] or
-                'field' in item['job_title'] or
-                'intern' in item['job_title'] or
-                'safety' in item['job_title'] or
-                'test' in item['job_title'] or
-                'cost' in item['job_title'] or
-                'sales' in item['job_title'] or
-                'tooling' in item['job_title'] or
-                'cnc' in item['job_title'] or
-                'lighting' in item['job_title'] or
-                'plant' in item['job_title'] or
-                'stress' in item['job_title'] or
-                'design' in item['job_title'] or
-                'reliability' in item['job_title']):
-        return True
+    anti_words = []
+    anti_words.append(r"manufacturing")
+    anti_words.append(r"hvac")
+    anti_words.append(r"facility")
+    anti_words.append(r"facilities")
+    anti_words.append(r"field")
+    anti_words.append(r"intern")
+    anti_words.append(r"safety")
+    anti_words.append(r"test")
+    anti_words.append(r"cost")
+    anti_words.append(r"sales")
+    anti_words.append(r"tooling")
+    anti_words.append(r"cnc")
+    anti_words.append(r"lighting")
+    anti_words.append(r"plant")
+    anti_words.append(r"stress")
+    anti_words.append(r"design")
+    anti_words.append(r"reliability")
+
+    for ii in anti_words:
+        if re.search(r"\b" + ii + r"\b", item['job_title']):
+            return True
     return False
