@@ -12,14 +12,15 @@ import lxml.etree
 import html2text
 import BeautifulSoup
 import logging
+import re
 
 
 class LearnScrapyPipeline(object):
     def process_item(self, item, spider):
         # if date_exclusion(self, item):
         #     raise DropItem("Too old %s" % item)
-        # if not location_inclusion(self, item):
-        #     raise DropItem("Location fail %s" % item)
+        if not location_inclusion(self, item):
+            raise DropItem("Location fail %s" % item)
         # if job_title_exclusion(self, item):
         #     raise DropItem("Job title fail %s" % item)
 
@@ -43,9 +44,9 @@ def format_response(self, item):
     try:
         body = h.handle(body.decode('utf8'))
         body = body.lower()
-    except Exception as thing:
+    except Exception as oops:
         logging.warning("Html2text screwed up!!")
-        logging.warning(thing.args)
+        logging.warning(oops.args)
     return body
 
 
@@ -65,7 +66,8 @@ def format_response(self, item):
 #     return False
 # 
 #
-""" This should be done with lxml via elem.getparent().remove(elem), but
+""" remove_javascript:
+    This should be done with lxml via elem.getparent().remove(elem), but
     something fishy was going on with the getparent() function. Punt for now. """
 
 
@@ -76,7 +78,8 @@ def remove_javascript(link_response):
         ii.extract()
     return soup.prettify()
 
-# 
+
+#
 # def job_title_exclusion(self, item):
 #     if ('manufacturing' in item['job_title'] or
 #                 'hvac' in item['job_title'] or
@@ -97,22 +100,25 @@ def remove_javascript(link_response):
 #     return False
 # 
 # 
-# def location_inclusion(self, item):
-#     if ('CA' in item['location'] or
-#                 'WA' in item['location'] or
-#                 'CO' in item['location'] or
-#                 'TX' in item['location'] or
-#                 'MN' in item['location'] or
-#                 'FL' in item['location'] or
-#                 'GA' in item['location'] or
-#                 'MA' in item['location'] or
-#                 'CT' in item['location'] or
-#                 'NY' in item['location'] or
-#                 'WI' in item['location'] or
-#                 'MD' in item['location'] or
-#                 'DE' in item['location'] or
-#                 'VA' in item['location'] or
-#                 'NJ' in item['location'] or
-#                 'IL' in item['location']):
-#         return True
-#     return False
+def location_inclusion(self, item):
+    locations = []
+    locations.append(r"ca")
+    locations.append(r"wa")
+    locations.append(r"co")
+    locations.append(r"tx")
+    locations.append(r"mn")
+    locations.append(r"fl")
+    locations.append(r"ga")
+    locations.append(r"ct")
+    locations.append(r"ny")
+    locations.append(r"wi")
+    locations.append(r"md")
+    locations.append(r"dc")
+    locations.append(r"va")
+    locations.append(r"nj")
+    locations.append(r"il")
+
+    for ii in locations:
+        if re.search(r"\b" + ii + r"\b", item['location']):
+            return True
+    return False

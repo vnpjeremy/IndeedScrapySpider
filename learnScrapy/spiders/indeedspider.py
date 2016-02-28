@@ -8,12 +8,15 @@ from scrapy.http import Request
 class IndeedSpider(scrapy.Spider):
     name = "indeed_spider"
     allowed_domains = ["www.indeed.com"]
-    start_urls = ["http://www.indeed.com/jobs?q=mechanical+title%3Aengineer&l=California&start=10",
+    start_urls = ["http://www.indeed.com/jobs?q=%28mechanical+or+aerospace%29+title%3Aengineer&l="
+                  "united+states&sr=directhire&start=0",
                   ]
-    base_url = "http://www.indeed.com/jobs?q=mechanical+title%3Aengineer&l=California&start="
+    base_url = "http://www.indeed.com/jobs?q=%28mechanical+or+aerospace%29+title%3Aengineer&l=" \
+               "united+states&sr=directhire&start="
 
-    # for i in range(20, 20, 10):
-    #     start_urls.append(base_url + str(i))
+    for i in range(10, 30, 10):
+        start_urls.append(base_url + str(i))
+    pages = len(start_urls)
 
     def parse(self, response):
         sel = Selector(response)
@@ -118,9 +121,9 @@ def location_inclusion(self, item):
                 'ny' in item['location'] or
         # 'WI' in item['location'] or
                 'md' in item['location'] or
-                'de' in item['location'] or
                 'va' in item['location'] or
                 'nj' in item['location'] or
+                'dc' in item['location'] or
                 'il' in item['location']):
         return True
     return False
