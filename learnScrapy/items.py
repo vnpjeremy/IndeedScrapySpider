@@ -7,7 +7,7 @@
 from scrapy.item import Item, Field
 
 
-class LearnScrapyItem(Item):
+class IndeedItem(Item):
     job_title = Field()
     company = Field()
     # linkURL = Field()
