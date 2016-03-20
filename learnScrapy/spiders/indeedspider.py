@@ -22,7 +22,7 @@ class IndeedSpider(scrapy.Spider):
     texas.url = "http://www.indeed.com/jobs?q=%28mechanical+or+aerospace%29+" \
                 "title%3Aengineer&l=texas&sr=directhire&start="
     texas.name = "texas"
-    # regions.append(texas)
+    regions.append(texas)
 
     colorado = Region()
     colorado.url = "http://www.indeed.com/jobs?q=%28mechanical+or+aerospace%29+" \
@@ -34,13 +34,13 @@ class IndeedSpider(scrapy.Spider):
     california.url = "http://www.indeed.com/jobs?q=%28mechanical+or+aerospace%29" \
                      "+title%3Aengineer&l=california&sr=directhire&start="
     california.name = "california"
-    # regions.append(california)
+    regions.append(california)
 
     washington = Region()
     washington.url = "http://www.indeed.com/jobs?q=%28mechanical+or+aerospace%29" \
                      "+title%3Aengineer&l=washington&sr=directhire&start="
     washington.name = "washington"
-    # regions.append(washington)
+    regions.append(washington)
 
     start_urls = []
     for ii in regions:
@@ -51,7 +51,7 @@ class IndeedSpider(scrapy.Spider):
         for state in IndeedSpider.regions:
             if state.name in response.url:
                 depth = parse_page_max_depth(self, response, state)
-                depth = 20
+                # depth = 20
                 for i in range(10, depth, 10):
                     str1 = state.url + str(i)
                     str1 = str1.decode('unicode-escape')
@@ -83,7 +83,7 @@ class IndeedSpider(scrapy.Spider):
                     request.meta['item'] = item
                     yield request
 
-        # Gather normal job listings """
+        # Gather normal job listings
         for ii in rows:
             item = IndeedItem()
             item['job_title'] = ii.xpath('h2/a/@title').extract()
@@ -129,38 +129,48 @@ def format_item(self, item):
 
 # Skipping here pares down the list of pages to be crawled, increasing speed non-trivially (vs in pipeline)
 def exclusion(self, item):
-    # if date_exclusion(self, item):
-    #     return True
-    # if job_title_exclusion(self, item):
-    #     return True
+    if date_exclusion(self, item):
+        return True
+    if job_title_exclusion(self, item):
+        return True
     return False
 
 
 def date_exclusion(self, item):
-    if '30+' in item['date']:
+    if re.search(re.escape("30+"), item['date']):
         return True
     return False
 
 
 def job_title_exclusion(self, item):
     anti_words = []
+    anti_words.append(r"design")
     anti_words.append(r"manufacturing")
     anti_words.append(r"hvac")
     anti_words.append(r"facility")
     anti_words.append(r"electrical")
+    anti_words.append(r"electro")
     anti_words.append(r"facilities")
     anti_words.append(r"field")
     anti_words.append(r"intern")
     anti_words.append(r"safety")
+    anti_words.append(r"packaging")
     anti_words.append(r"test")
+    anti_words.append(r"tool")
     anti_words.append(r"cost")
     anti_words.append(r"sales")
     anti_words.append(r"tooling")
     anti_words.append(r"cnc")
+    anti_words.append(r"internship")
     anti_words.append(r"lighting")
     anti_words.append(r"plant")
     anti_words.append(r"stress")
-    anti_words.append(r"design")
+    anti_words.append(r"construction")
+    anti_words.append(r"building")
+    anti_words.append(r"plumbing")
+    anti_words.append(r"civil")
+    anti_words.append(r"quality")
+    anti_words.append(r"maintenance")
     anti_words.append(r"reliability")
 
     for ii in anti_words:
